@@ -19,12 +19,21 @@ export default function ImageDisplay({
   selected,
   ratio,
 }) {
-  let src = new URL(config.src);
+  let src = null;
+  try {
+    if (config?.src) {
+      src = new URL(config.src, window.location.origin);
+    }
+  } catch {
+    return (
+      <WidgetShell title={title} loading={loading} error="Invalid image URL" selected={selected} />
+    );
+  }
 
-  if (config.sendRatio) {
+  if (src && config.sendRatio) {
     src.searchParams.set("ratio", ratio);
   }
-  if (config.forceDynamic) {
+  if (src && config.forceDynamic) {
     src.searchParams.set("t", Date.now());
     src.searchParams.set("r", Math.random());
   }
@@ -41,7 +50,7 @@ export default function ImageDisplay({
       error={error}
       selected={selected}
     >
-      {config.src && (
+      {src && (
         <div className="image-widget">
           <img
             src={src.toString()}
